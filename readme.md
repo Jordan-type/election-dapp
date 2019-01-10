@@ -2,7 +2,17 @@
 
 Tutorial video: https://www.youtube.com/watch?v=3681ZYbDSSk
 
-Command-line outputs
+**Install dependencies**
+
+> $ npm install -g truffle
+> 
+> $ mkdir election
+> 
+> $ cd election
+> 
+> $ truffle unbox pet-shop
+> 
+> $ npm install
 
 ## 1. Smoke Test (https://github.com/aimanbaharum/election-dapp/commit/927773041c50ce81da9828d97e0bf8281c7f707c)
 
@@ -304,7 +314,7 @@ D:\Workspace\election>npm run dev
    [Browsersync] Watching files...
 ```
 
-## 3. Cast Votes
+## 3. Cast Votes (https://github.com/aimanbaharum/election-dapp/commit/98a08436bff5448c62807b9bba32b6fa3cf1fa98)
 
 _**FIXME:** `web3.eth.accounts` is deprecated. Use `web3.eth.getAccounts()` for asynchronous purpose. getAccounts() returns an array of addresses. Cannot seem to get single account to test `vote()` function._ See https://ethereum.stackexchange.com/questions/65342/fetching-single-account-from-web3-eth
 
@@ -351,3 +361,59 @@ D:\Workspace\election>npm run dev
 
 Note:  
 A logged in address can only vote once as according to our contract. Voting form will disappear after voting. Log in to another Ganache account to vote with another address.
+
+## 4. Watch Events
+
+**Test**
+
+D:\Workspace\election>truffle test
+
+```
+   Using network 'development'.
+
+   Compiling .\contracts\Election.sol...
+
+   /D/Workspace/election/contracts/Election.sol:51:9: TypeError: Event invocations have to be prefixed by "emit".
+         votedEvent(_candidateId);
+         ^----------------------^
+   Compilation failed. See above.
+```
+
+> In a recent release (v0.4.21 at 8th March 2018), `emit` keyword has been introduced to emit the event. This will help to differentiate the functions from event which was one of the reason of TheDAO Hack which led to hard fork in Ethereum & gave birth to Ethereum Classic.
+> 
+> General: Support and recommend using `emit EventName();` to call events explicitly.
+> 
+> In order to make events stand out with regards to regular function calls, `emit EventName()` as opposed to just `EventName()` should now be used to "call" events.
+
+Readings: https://medium.com/@aniketengg/emit-keyword-in-solidity-242a679b0e1a
+
+D:\Workspace\election>truffle test
+
+```
+Using network 'development'.
+
+Compiling .\contracts\Election.sol...
+
+
+  Contract: Election
+    √ initializes with two candidates (43ms)
+    √ it initilalizes the candidates with the correct values (350ms)
+    √ allows a voter to cast a vote (203ms)
+    √ throws an exception for invalid candidates (320ms)
+    √ throws an exception for double voting (405ms)
+
+
+  5 passing (1s)
+```
+
+**Running in web browser**
+
+D:\Workspace\election>npm run dev
+
+Event will be triggered and UI will refresh itself once a vote is casted (new tx found in the blockchain)
+
+Console output:
+
+```
+event triggered {…}​address: "0x997fcc0116785465918e42c75674ed534c187686"​args: Object { _candidateId: {…} }​blockHash: "0x1053ac906a63fc725ee3cb9992c39f969e7fe1952d2f19078b231a611794e3be"​blockNumber: 61​event: "votedEvent"​logIndex: 0​transactionHash: "0x366b374313cf2c11d3884cf8c243927ea3e1f6655f9458d5f4165b84f688a44a"​transactionIndex: 0​type: "mined"​<prototype>: Object { … } app.js:48:9
+```
