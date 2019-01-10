@@ -90,7 +90,7 @@ D:\Workspace\election>truffle console
    truffle(development)>.exit
 ```
 
-## 2. List Candidates
+## 2. List Candidates (https://github.com/aimanbaharum/election-dapp/commit/08cbae682d168096e9df1e0eff2889bc5329e0c6)
 
 **Storage vs Memory vs Stack**
 
@@ -107,6 +107,8 @@ Further readings:
 - https://ethereum.stackexchange.com/questions/1701/what-does-the-keyword-memory-do-exactly
 
 **Migration reset**
+
+Since we are still modifying the same Contract, just reset the migration. NOTE: only on development mode
 
 D:\Workspace\election>truffle migrate --reset
 
@@ -232,11 +234,20 @@ D:\Workspace\election>truffle console
 
    ...
 
-   truffle(development)> web3.eth.accounts
+   truffle(development)> web3.eth.getAccounts() // asynchronous call
 
-   ... showing accounts connected from Ganache (development)
+   [ '0x26a2C6638097813b2368C06E69cd6ab72A25a596',
+   '0xd941c4Fd3d4e73D380A9F014A23B785ad6706F4C',
+   '0xA31382225d632deC178b39a608C12046B145C406',
+   '0xe2072A132A25a9F43AAD6854c44F7111CC6EAe0c',
+   '0x88932d3B2ebAed62d2f3847Db119Db98Ff6b1D1B',
+   '0xdB8Af57C86B742810922F518580D55c1a855D6de',
+   '0x59aD6B82A5A102193596F3b3832cbB78107Ee78f',
+   '0xACcec393A7B4a9D68802c3cA634a784E5A712765',
+   '0x1c656aABe88f65b337cc6361B405cF1894649088',
+   '0x05dE2CEa7A11EeF4a995daB54489adB63b8ef073' ]
 
-   truffle(development)> web3.eth.accounts[0]
+   truffle(development)> web3.eth.accounts[0] // won't work with > 0.4.1
 
    ... showing first account
 
@@ -292,3 +303,51 @@ D:\Workspace\election>npm run dev
    [Browsersync] Serving files from: ./build/contracts
    [Browsersync] Watching files...
 ```
+
+## 3. Cast Votes
+
+_**FIXME:** `web3.eth.accounts` is deprecated. Use `web3.eth.getAccounts()` for asynchronous purpose. getAccounts() returns an array of addresses. Cannot seem to get single account to test `vote()` function._ See https://ethereum.stackexchange.com/questions/65342/fetching-single-account-from-web3-eth
+
+
+D:\Workspace\election>truffle migrate --reset
+
+...
+
+D:\Workspace\election>truffle console
+
+```
+   truffle(development)> Election.deployed().then(function(i) { app = i; })
+   undefined
+   truffle(development)> app.vote(1, { from: web3.eth.accounts[0] }) // metadata 'from' telling web3 to cast a vote using the first account 0
+```
+
+**Test vote() function**
+
+D:\Workspace\election>truffle test
+
+```
+   Using network 'development'.
+
+   Contract: Election
+    √ initializes with two candidates (55ms)
+    √ it initilalizes the candidates with the correct values (112ms)
+    √ allows a voter to cast a vote (237ms)
+    √ throws an exception for invalid candidates (289ms)
+    √ throws an exception for double voting (366ms)
+
+
+  5 passing (1s)
+```
+
+**Running in web browser**
+
+D:\Workspace\election>truffle migrate --reset
+
+...
+
+D:\Workspace\election>npm run dev
+
+...
+
+Note:  
+A logged in address can only vote once as according to our contract. Voting form will disappear after voting. Log in to another Ganache account to vote with another address.
