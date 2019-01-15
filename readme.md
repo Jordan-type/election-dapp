@@ -1,5 +1,7 @@
 # Scribble Notes
 
+## Building a Solidity dapp
+
 Tutorial video: https://www.youtube.com/watch?v=3681ZYbDSSk
 
 **Install dependencies**
@@ -14,7 +16,7 @@ Tutorial video: https://www.youtube.com/watch?v=3681ZYbDSSk
 > 
 > $ npm install
 
-## 1. Smoke Test (https://github.com/aimanbaharum/election-dapp/commit/927773041c50ce81da9828d97e0bf8281c7f707c)
+#### 1. Smoke Test (https://github.com/aimanbaharum/election-dapp/commit/927773041c50ce81da9828d97e0bf8281c7f707c)
 
 As of ^0.5.0, constructor is named `constructor()` instead of `function ClassName()`.
 
@@ -100,7 +102,7 @@ D:\Workspace\election>truffle console
    truffle(development)>.exit
 ```
 
-## 2. List Candidates (https://github.com/aimanbaharum/election-dapp/commit/08cbae682d168096e9df1e0eff2889bc5329e0c6)
+#### 2. List Candidates (https://github.com/aimanbaharum/election-dapp/commit/08cbae682d168096e9df1e0eff2889bc5329e0c6)
 
 **Storage vs Memory vs Stack**
 
@@ -314,7 +316,7 @@ D:\Workspace\election>npm run dev
    [Browsersync] Watching files...
 ```
 
-## 3. Cast Votes (https://github.com/aimanbaharum/election-dapp/commit/98a08436bff5448c62807b9bba32b6fa3cf1fa98)
+#### 3. Cast Votes (https://github.com/aimanbaharum/election-dapp/commit/98a08436bff5448c62807b9bba32b6fa3cf1fa98)
 
 _**FIXME:** `web3.eth.accounts` is deprecated. Use `web3.eth.getAccounts()` for asynchronous purpose. getAccounts() returns an array of addresses. Cannot seem to get single account to test `vote()` function._ See https://ethereum.stackexchange.com/questions/65342/fetching-single-account-from-web3-eth
 
@@ -362,7 +364,7 @@ D:\Workspace\election>npm run dev
 Note:  
 A logged in address can only vote once as according to our contract. Voting form will disappear after voting. Log in to another Ganache account to vote with another address.
 
-## 4. Watch Events (https://github.com/aimanbaharum/election-dapp/commit/0541ad4eb99a377cabf20db6853e785b7bf634e4)
+#### 4. Watch Events (https://github.com/aimanbaharum/election-dapp/commit/0541ad4eb99a377cabf20db6853e785b7bf634e4)
 
 **Test**
 
@@ -417,3 +419,122 @@ Console output:
 ```
 event triggered {…}​address: "0x997fcc0116785465918e42c75674ed534c187686"​args: Object { _candidateId: {…} }​blockHash: "0x1053ac906a63fc725ee3cb9992c39f969e7fe1952d2f19078b231a611794e3be"​blockNumber: 61​event: "votedEvent"​logIndex: 0​transactionHash: "0x366b374313cf2c11d3884cf8c243927ea3e1f6655f9458d5f4165b84f688a44a"​transactionIndex: 0​type: "mined"​<prototype>: Object { … } app.js:48:9
 ```
+
+## Running an IPFS
+
+Tutorial video: https://www.youtube.com/watch?v=ADoRVVOSpI8
+
+**Install dependencies**
+
+Windows: https://dist.ipfs.io/#go-ipfs
+
+Objective: to move away from centralized front-end hosting
+
+1. Initialize a node
+
+> ipfs init
+
+2. Run the node. Keep it running
+   
+> ipfs daemon
+
+```bash
+Initializing daemon...
+go-ipfs version: 0.4.18-
+Repo version: 7
+System version: amd64/windows
+Golang version: go1.11.1
+Swarm listening on /ip4/127.0.0.1/tcp/4001
+Swarm listening on /ip4/169.254.114.118/tcp/4001
+Swarm listening on /ip4/169.254.55.93/tcp/4001
+Swarm listening on /ip4/192.168.1.10/tcp/4001
+Swarm listening on /ip4/192.168.1.5/tcp/4001
+Swarm listening on /ip6/::1/tcp/4001
+Swarm listening on /p2p-circuit
+Swarm announcing /ip4/127.0.0.1/tcp/4001
+Swarm announcing /ip4/169.254.114.118/tcp/4001
+Swarm announcing /ip4/169.254.55.93/tcp/4001
+Swarm announcing /ip4/192.168.1.10/tcp/4001
+Swarm announcing /ip4/192.168.1.5/tcp/4001
+Swarm announcing /ip6/::1/tcp/4001
+API server listening on /ip4/127.0.0.1/tcp/5001
+Gateway (readonly) server listening on /ip4/127.0.0.1/tcp/8080
+Daemon is ready
+```
+
+3. Understanding Solidity dapp structure
+
+`/src` - is where our client side front-end stored. need this to be served in our ipfs node.
+`/build/contracts` - contract abstractions. need this for serving front-end client distributed data
+
+1. Create directory for ipfs serving
+
+> mkdir dist
+
+5. Sync files with dist/
+
+Using bash on Windows,
+
+> rsync -r src/ dist/
+> 
+> rsync -r build/contracts/ dist/
+
+6. Gather peers to share the content
+
+> ipfs swarm peers
+
+7. Add dist/ to ipfs node
+
+> ipfs add -r dist/
+
+```bash
+ 111.96 KiB / ? added QmSaYyDbjAvzzwQwAUy1zXAHvByjDJAH4teohoCHTkabdz dist/Election.json
+ 163.72 KiB / 1.42 MiB 11.25% added Qmc4ys53sPgXRKk3WeiqwqDpnzc7DwDQckQ8mkNBHCaNeo dist/Migrations.json
+ 282.08 KiB / 1.42 MiB 19.39% added QmYUaCPwvJWiueRXFSTTv8vdedWWzRhRdn8RMw35e7k67u dist/css/bootstrap.min.css
+ 811.56 KiB / 1.42 MiB 55.77% added QmbrzMumAwEPCoLs6jBdDyHz2TBjpkSFhcCHMT7fBsdFyr dist/css/bootstrap.min.css.map
+ 831.22 KiB / 1.42 MiB 57.12% added QmWhoNhVUb9bcjuKLB259VYogJpPsJaAe8dern9LK95tVN dist/fonts/glyphicons-halflings-regular.eot
+ 937.41 KiB / 1.42 MiB 64.42% added QmbcbjLEC1aHy4j2qvtncevjenYwHjEF4qZ2kK5pRJzDLg dist/fonts/glyphicons-halflings-regular.svg
+ 981.75 KiB / 1.42 MiB 67.47% added QmciDEkreBpY2S6Ktg1Zarbsx5K2DmHK59H261Bjr2fnuR dist/fonts/glyphicons-halflings-regular.ttf
+ 1004.62 KiB / 1.42 MiB 69.04% added QmaYEdLkMnEHVN8HZB2GGETottySZoHh3TnYZERke36PVr dist/fonts/glyphicons-halflings-regular.woff
+ 1022.23 KiB / 1.42 MiB 70.25% added QmUbUsBQbjJhm5iYba5jqibRr4A6gG3HVczSy5gs5PrMhY dist/fonts/glyphicons-halflings-regular.woff2
+ 1.00 MiB / 1.42 MiB 70.42% added QmbSX6YDWdSihZUUDLJdd4dR22VxD4BYE7tY5cCFSt9NyC dist/index.html
+ 1.00 MiB / 1.42 MiB 70.68% added Qmd8tPiA6uqvh49bF6SBvG83dSsufswTLJWeZhcdn9vxo5 dist/js/app.js
+ 1.04 MiB / 1.42 MiB 73.16% added QmNXRFREw7waGtKW9uBUze3PkR9E12HeeAQSkZQSiFUJqo dist/js/bootstrap.min.js
+ 1.29 MiB / 1.42 MiB 90.53% added QmZQp29tbdppjqyixxM8L8NjsG4paN4eVW9GxZYicXov9v dist/js/truffle-contract.js
+ 1.42 MiB / 1.42 MiB 100.00% added QmdTtsVM7KtvycQ68f9M43N4EQKvbd58q8aeAhP2fMz4Di dist/js/web3.min.js
+ 1.42 MiB / 1.42 MiB 100.00% added QmQfwrATTrJc1aTN1dVu9K7nQ5rw67np8yg46EvAbqKEZw dist/css
+ 1.42 MiB / 1.42 MiB 100.00% added QmUNLLsPACCz1vLxQVkXqqLX5R1X345qqfHbsf67hvA3Nn dist/dist
+ 1.42 MiB / 1.42 MiB 100.00% added Qmb3fJpXVGvUnNeRLC3P5sTXMzjpf5zq4tKt9XjhtYFf1k dist/fonts
+ 1.42 MiB / 1.42 MiB 100.00% added QmUNLLsPACCz1vLxQVkXqqLX5R1X345qqfHbsf67hvA3Nn dist/images
+ 1.42 MiB / 1.42 MiB 100.00% added QmbFdwzJsGexRoDg2y76iqUGtm9UqosDUMhbuFHAVdREvB dist/js
+ 1.42 MiB / 1.42 MiB 100.00% added QmPi18aR7qrH9mEcAfHVS81LzrWFHbf1fFJexNPwYYgBbk dist
+ 1.42 MiB / 1.42 MiB 100.00%
+ ```
+
+8. Get the hash of dist/ directory
+
+The last hash of `add` command above.
+
+> 1.42 MiB / 1.42 MiB 100.00% added QmPi18aR7qrH9mEcAfHVS81LzrWFHbf1fFJexNPwYYgBbk dist
+
+Hash: `QmPi18aR7qrH9mEcAfHVS81LzrWFHbf1fFJexNPwYYgBbk`
+
+9. Publish the hash to ipfs
+
+This hash of dist/ is like a root folder for our website
+
+> ipfs name publish QmPi18aR7qrH9mEcAfHVS81LzrWFHbf1fFJexNPwYYgBbk
+> 
+> Published to QmV2uBS8UbRhZg44gqDuqduuPS2zRVDvsvirjrrw8kcnSy: /ipfs/QmPi18aR7qrH9mEcAfHVS81LzrWFHbf1fFJexNPwYYgBbk
+
+10. Access through a web browser
+
+- Go to https://gateway.ipfs.io
+- Get the hash: QmPi18aR7qrH9mEcAfHVS81LzrWFHbf1fFJexNPwYYgBbk
+- Paste in the URL with `/ipfs/` prepended
+
+> https://gateway.ipfs.io/ipfs/QmPi18aR7qrH9mEcAfHVS81LzrWFHbf1fFJexNPwYYgBbk
+
+11. Done
+
+Fully decentralized application -- backend with ethereum blockchain, frontend with ipfs
